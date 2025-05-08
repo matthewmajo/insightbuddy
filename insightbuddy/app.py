@@ -6,7 +6,7 @@ from openai import OpenAI
 import os
 
 # --- Load API key securely ---
-api_key = st.secrets["OPENAI_API_KEY"] if "OPENAI_API_KEY" in st.secrets else os.getenv("OPENAI_API_KEY")
+api_key = st.secrets["OPENAI_API_KEY"]
 client = OpenAI(api_key=api_key)
 
 # --- Create or connect to SQLite DB ---
