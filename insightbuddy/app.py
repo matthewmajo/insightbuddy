@@ -5,6 +5,8 @@ import openai
 from openai import OpenAI
 import os
 
+api_key = st.secrets["OPENAI_API_KEY"] if "OPENAI_API_KEY" in st.secrets else os.getenv("OPENAI_API_KEY")
+
 # --- Setup ---
 openai.api_key = st.secrets["OPENAI_API_KEY"] if "OPENAI_API_KEY" in st.secrets else os.getenv("OPENAI_API_KEY")
 
@@ -83,6 +85,7 @@ SQL:
             )
 
             sql_code = response.choices[0].message.content.strip()
+
 
             st.code(sql_code, language="sql")
 
