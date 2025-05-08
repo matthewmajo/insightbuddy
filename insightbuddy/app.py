@@ -4,6 +4,7 @@ import sqlite3
 import pandas as pd
 from openai import OpenAI
 import os
+import re
 
 # --- Load API key securely ---
 api_key = st.secrets["OPENAI_API_KEY"]
@@ -79,7 +80,18 @@ SQL:
                 temperature=0.3
             )
 
-            sql_code = response.choices[0].message.content.strip()
+
+            # Extract SQL code block using regex
+            content = response.choices[0].message.content.strip()
+            sql_match = re.search(r"```sql\s*(.*?)\s*```", content, re.DOTALL | re.IGNORECASE)
+            
+            if sql_match:
+                sql_code = sql_match.group(1).strip()
+            else:
+                # Fallback: try to isolate last SQL-looking block
+                lines = content.strip().splitlines()
+                sql_code = "\n".join(line for line in lines if line.strip().lower().startswith(("select", "with", "insert", "update", "delete", "create", "drop")))
+            
             st.code(sql_code, language="sql")
 
             try:
