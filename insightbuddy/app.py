@@ -1,14 +1,12 @@
 import streamlit as st
 import sqlite3
 import pandas as pd
-import openai
 from openai import OpenAI
 import os
 
+# --- Load API key securely ---
 api_key = st.secrets["OPENAI_API_KEY"] if "OPENAI_API_KEY" in st.secrets else os.getenv("OPENAI_API_KEY")
-
-# --- Setup ---
-openai.api_key = st.secrets["OPENAI_API_KEY"] if "OPENAI_API_KEY" in st.secrets else os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=api_key)
 
 # --- Create or connect to SQLite DB ---
 conn = sqlite3.connect("sample.db")
@@ -23,7 +21,6 @@ def init_db():
         signup_date TEXT
     )
     """)
-
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS orders (
         id INTEGER PRIMARY KEY,
@@ -33,7 +30,6 @@ def init_db():
         FOREIGN KEY(user_id) REFERENCES users(id)
     )
     """)
-
     if cursor.execute("SELECT COUNT(*) FROM users").fetchone()[0] == 0:
         cursor.executemany("INSERT INTO users (name, signup_date) VALUES (?, ?)", [
             ("Alice", "2023-01-10"),
@@ -73,8 +69,6 @@ User Question: {query}
 SQL:
 """
         try:
-            client = OpenAI(api_key=openai.api_key)
-
             response = client.chat.completions.create(
                 model="gpt-4o",
                 messages=[
@@ -85,8 +79,6 @@ SQL:
             )
 
             sql_code = response.choices[0].message.content.strip()
-
-
             st.code(sql_code, language="sql")
 
             try:
