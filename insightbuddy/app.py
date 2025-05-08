@@ -2,6 +2,7 @@ import streamlit as st
 import sqlite3
 import pandas as pd
 import openai
+from openai import OpenAI
 import os
 
 # --- Setup ---
@@ -70,7 +71,9 @@ User Question: {query}
 SQL:
 """
         try:
-            response = openai.ChatCompletion.create(
+            client = OpenAI(api_key=openai.api_key)
+
+            response = client.chat.completions.create(
                 model="gpt-4o",
                 messages=[
                     {"role": "system", "content": "You translate questions into SQL."},
@@ -78,6 +81,7 @@ SQL:
                 ],
                 temperature=0.3
             )
+
             sql_code = response.choices[0].message.content.strip()
 
             st.code(sql_code, language="sql")
