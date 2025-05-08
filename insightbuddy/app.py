@@ -80,19 +80,26 @@ SQL:
                 temperature=0.3
             )
 
-
-            # Extract SQL code block using regex
             content = response.choices[0].message.content.strip()
-            sql_match = re.search(r"```sql\s*(.*?)\s*```", content, re.DOTALL | re.IGNORECASE)
             
+            # Extract explanation before SQL
+            sql_match = re.search(r"```sql\s*(.*?)\s*```", content, re.DOTALL | re.IGNORECASE)
+            explanation = content.split("```sql")[0].strip() if "```sql" in content else ""
+            
+            # Get just the SQL code
             if sql_match:
                 sql_code = sql_match.group(1).strip()
             else:
-                # Fallback: try to isolate last SQL-looking block
-                lines = content.strip().splitlines()
-                sql_code = "\n".join(line for line in lines if line.strip().lower().startswith(("select", "with", "insert", "update", "delete", "create", "drop")))
+                sql_code = content  # fallback
             
+            # Show explanation
+            if explanation:
+                st.markdown("**Explanation:**")
+                st.write(explanation)
+            
+            # Show code and results
             st.code(sql_code, language="sql")
+
 
             try:
                 df = pd.read_sql_query(sql_code, conn)
