@@ -72,7 +72,7 @@ SQL:
 """
         try:
             response = client.chat.completions.create(
-                model="gpt-4o",
+                model="gpt-4.1-mini",  # Use the correct model identifier here
                 messages=[
                     {"role": "system", "content": "You translate questions into SQL."},
                     {"role": "user", "content": prompt}
